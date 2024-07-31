@@ -4,10 +4,11 @@ import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import App from "./App";
 import Auth from "./components/Auth";
 
+import App from "./routes/StartPage";
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <App />, // 시작 페이지 미완성
+    element: <App />, // 시작 페이지
   },
   {
     path: "/auth",
