@@ -5,7 +5,7 @@ function App() {
   return (
     <>
       <main>
-        <img src={PUBLIC + "/logo.png"} />
+        <img src="/logo.png" />
         <h1>Weasel</h1>
         <p>ang kimotti</p>
         <p>
