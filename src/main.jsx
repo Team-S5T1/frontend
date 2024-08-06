@@ -3,10 +3,16 @@ import ReactDOM from "react-dom/client";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import "./index.css";
 import App from "./routes/App";
+import Main from "./routes/Main";
+
 const router = createBrowserRouter([
   {
     path: "/",
     element: <App />, // 시작 페이지
+  },
+  {
+    path: "/prompt",
+    element: <Main />, // 메인 프롬프트 페이지
   },
 ]);
 
