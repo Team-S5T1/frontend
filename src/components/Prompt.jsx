@@ -4,8 +4,11 @@ import styled from "styled-components";
 import "tailwindcss/tailwind.css";
 
 const ChatContainer = styled.div`
-  width: 50%;
+  display: flex;
+  flex-direction: column;
   flex: 1;
+  width: 50%;
+  height: 80%;
   padding: 20px;
   overflow-y: auto;
 `;
@@ -14,14 +17,15 @@ const Message = styled.div`
   display: inline-block;
   margin: 10px 0;
   padding: 10px;
-  border-radius: 5px;
+  border-radius: 15px;
   word-wrap: break-word;
 
   // 템플릿 리터럴 문법: '컴포넌트의 props'에 따라 동적으로 설정하는 문법
   // <Message key={index} type={msg.type}> 여기처럼 '컴포넌트'의 type을 지정해주어야 함.
-  max-width: ${({ type }) => (type === "user" ? "50%" : "100%")};
+  max-width: ${({ type }) => (type === "user" ? "70%" : "100%")};
   width: ${({ type }) => (type === "user" ? "auto" : "100%")};
   align-self: ${({ type }) => (type === "user" ? "flex-end" : "flex-start")};
+  background-color: ${({ type }) => (type === "user" ? "#484254" : "#484254")};
 `;
 
 const ImagePreviewContainer = styled.div`
@@ -46,9 +50,9 @@ const InputContainer = styled.div`
   position: relative;
   display: flex;
   align-items: center;
-  border-radius: 5px;
+  border-radius: 10px;
   padding: 5px;
-  background-color: gray;
+  background-color: #484254;
   text-color: #ffffff;
 `;
 
@@ -56,8 +60,9 @@ const StyledInput = styled.input`
   flex-grow: 1;
   border: none;
   outline: none;
-  padding: 5px;
-  background-color: gray;
+  padding: 8px;
+  background-color: #484254;
+  cursor: text;
 `;
 
 function Prompt() {
@@ -83,11 +88,11 @@ function Prompt() {
       setTimeout(() => {
         const botResponse = {
           type: "bot",
-          content: input ? `You said: ${input}` : "You sent an image",
+          content: input ? `Weasel: ${input}` : "You sent an image",
           imageUrl: previewImage,
         };
         setMessages((prevMessages) => [...prevMessages, botResponse]);
-      }, 1000);
+      }, 50);
 
       // 응답이 끝난 후 입력창&이미지 초기화
       setInput("");
@@ -121,9 +126,9 @@ function Prompt() {
   // 출력 컴포넌트
   return (
     // 최상위 태그
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-background-start via-gray-700 to-background-end text-white">
+    <div className="flex flex-col overflow-y-auto items-center justify-center min-h-screen bg-gradient-to-r from-background-start via-gray-800 to-background-end text-white">
       {/* 채팅 메세지 목록 */}
-      <ChatContainer>
+      <ChatContainer className="overflow-y-auto">
         {/* map 함수를 사용하여 메세지 배열 전체를 순회하여 렌더링 */}
         {messages.map((msg, index) => (
           <Message key={index} type={msg.type}>
@@ -141,14 +146,30 @@ function Prompt() {
       </ChatContainer>
 
       {/* Form 컴포넌트: 폼 제출 시 페이지 리로드 없이 데이터를 처리하기 위해 사용
-      + request 속성을 사용하면 name에 맞는 formData 객체를 만들어 보낼 수 있어 편함 ex) const formData = request.formData*/}
-      <Form
-        onSubmit={sendMessage} // form이 제출될 때 실행될 함수, 메세지 배열에 메세지를 추가하고 axios 요청을 보냄
-        className="w-1/2 p-4 border-t border-gray-300"
-      >
+        + request 속성을 사용하면 name에 맞는 formData 객체를 만들어 보낼 수 있어 편함 ex) const formData = request.formData*/}
+      {/* onSubMit을 사용하면 엔터, 클릭 시 폼이 제출됨 */}
+      <Form className="w-1/2 m-10" onSubmit={sendMessage}>
         <InputContainer>
+          {/* 이미지 선택버튼 */}
+          {/* 아이콘 출처: heroicons.com */}
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="size-8 mx-2 cursor-pointer"
+            onClick={() => {
+              fileInputRef.current.click();
+            }}
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"
+            />
+          </svg>
           {previewImage && <ImagePreview src={previewImage} alt="Preview" />}
-
           {/* 이미지 제거 버튼 */}
           {previewImage && (
             <RemovePreview onClick={removePreviewImage}>×</RemovePreview>
@@ -162,22 +183,31 @@ function Prompt() {
             onChange={(e) => setInput(e.target.value)}
             placeholder="Type a message..."
           />
+          {/* 폼 제출: action 사용해서 router 호출하는 방식 사용할 것 */}
+          {/* 아이콘 출처: heroicon */}
+          <button type="submit">
+            <svg
+              type="submit"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              className="size-8 mx-2 cursor-pointer"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5"
+              />
+            </svg>
+          </button>
         </InputContainer>
-        {/* 이미지 선택버튼(변경 예정) */}
         <input
           type="file"
           onChange={handleImageUpload}
-          className="mb-2"
+          className="mb-2 hidden"
           ref={fileInputRef}
         />
-
-        {/* 폼 제출: action 사용해서 router 호출하는 방식 사용할 것 */}
-        <button
-          type="submit"
-          className="p-2 mt-2 text-lg text-white bg-blue-500 rounded w-full"
-        >
-          Send
-        </button>
       </Form>
     </div>
   );
